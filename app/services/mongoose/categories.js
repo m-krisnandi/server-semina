@@ -10,7 +10,10 @@ const createCategories = async (req) => {
   const { name } = req.body;
 
   // cari kategori dengan nama yang sama
-  const check = await Categories.findOne({ name });
+  const check = await Categories.findOne({
+    name,
+    organizer: req.user.organizer,
+  });
 
   // jika ada kategori dengan nama yang sama, maka throw error
   if (check) throw new BadRequestError('Kategori nama duplikat');
@@ -54,7 +57,7 @@ const updateCategories = async (req) => {
     {
       _id: id,
     },
-    { name },
+    { name, organizer: req.user.organizer },
     { new: true, runValidators: true }
   );
 

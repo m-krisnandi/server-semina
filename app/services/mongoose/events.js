@@ -8,7 +8,7 @@ const { NotFoundError, BadRequestError } = require('../../errors');
 const getAllEvents = async (req) => {
   const { keyword, category, talent, status } = req.query;
 
-  let condition = {};
+  let condition = { organizer: req.user.organizer };
 
   if (keyword) {
     condition = { ...condition, title: { $regex: keyword, $options: 'i' } };
@@ -65,7 +65,7 @@ const createEvents = async (req) => {
   await checkingTalents(talent);
 
   // cari Events dengan title yang sama
-  const check = await Events.findOne({ title });
+  const check = await Events.findOne({ title, organizer: req.user.organizer });
 
   if (check) throw new BadRequestError('Judul event sudah ada');
 
@@ -82,6 +82,7 @@ const createEvents = async (req) => {
     image,
     category,
     talent,
+    organizer: req.user.organizer,
   });
 
   return result;
@@ -90,7 +91,10 @@ const createEvents = async (req) => {
 const getOneEvents = async (req) => {
   const { id } = req.params;
 
-  const result = await Events.findOne({ _id: id })
+  const result = await Events.findOne({
+    _id: id,
+    organizer: req.user.organizer,
+  })
     .populate({ path: 'image', select: '_id name' })
     .populate({
       path: 'category',
@@ -134,7 +138,11 @@ const updateEvents = async (req) => {
   await checkingTalents(talent);
 
   // cari Events dengan title dan id yang berbeda
-  const check = await Events.findOne({ title, _id: { $ne: id } });
+  const check = await Events.findOne({
+    title,
+    _id: { $ne: id },
+    organizer: req.user.organizer,
+  });
 
   if (check) throw new BadRequestError('Judul event sudah ada');
 
@@ -155,6 +163,7 @@ const updateEvents = async (req) => {
       image,
       category,
       talent,
+      organizer: req.user.organizer,
     },
     {
       new: true,
@@ -179,6 +188,7 @@ const updateStatusEvents = async (req) => {
     },
     {
       statusEvent,
+      organizer: req.user.organizer,
     },
     {
       new: true,
@@ -192,7 +202,10 @@ const updateStatusEvents = async (req) => {
 const deleteEvents = async (req) => {
   const { id } = req.params;
 
-  const result = await Events.findOne({ _id: id });
+  const result = await Events.findOne({
+    _id: id,
+    organizer: req.user.organizer,
+  });
 
   if (!result) throw new NotFoundError(`Event dengan id ${id} tidak ditemukan`);
 

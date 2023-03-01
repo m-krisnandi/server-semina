@@ -5,7 +5,7 @@ const { NotFoundError, BadRequestError } = require('../../errors');
 const getAllTalents = async (req) => {
   const { keyword } = req.query;
 
-  let condition = {};
+  let condition = { organizer: req.user.organizer };
 
   if (keyword) {
     condition = { ...condition, name: { $regex: keyword, $options: 'i' } };
@@ -28,11 +28,16 @@ const createTalents = async (req) => {
   await checkingImage(image);
 
   // cek apakah talent sudah ada
-  const check = await Talents.findOne({ name });
+  const check = await Talents.findOne({ name, organizer: req.user.organizer });
 
   if (check) throw new BadRequestError('Talent sudah ada');
 
-  const result = await Talents.create({ name, role, image });
+  const result = await Talents.create({
+    name,
+    role,
+    image,
+    organizer: req.user.organizer,
+  });
 
   return result;
 };
@@ -40,7 +45,10 @@ const createTalents = async (req) => {
 const getOneTalents = async (req) => {
   const { id } = req.params;
 
-  const result = await Talents.findOne({ _id: id })
+  const result = await Talents.findOne({
+    _id: id,
+    organizer: req.user.organizer,
+  })
     .populate({
       path: 'image',
       select: '_id name',
@@ -61,7 +69,11 @@ const updateTalents = async (req) => {
   await checkingImage(image);
 
   // cek apakah talent sudah ada
-  const check = await Talents.findOne({ name, _id: { $ne: id } });
+  const check = await Talents.findOne({
+    name,
+    organizer: req.user.organizer,
+    _id: { $ne: id },
+  });
 
   if (check) throw new BadRequestError('Talent sudah ada');
 
@@ -73,6 +85,7 @@ const updateTalents = async (req) => {
       name,
       role,
       image,
+      organizer: req.user.organizer,
     },
     {
       new: true,
@@ -89,7 +102,10 @@ const updateTalents = async (req) => {
 const deleteTalents = async (req) => {
   const { id } = req.params;
 
-  const result = await Talents.findOne({ _id: id });
+  const result = await Talents.findOne({
+    _id: id,
+    organizer: req.user.organizer,
+  });
 
   if (!result)
     throw new NotFoundError(`Talent dengan id: ${id} tidak ditemukan`);
