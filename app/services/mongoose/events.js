@@ -22,10 +22,10 @@ const getAllEvents = async (req) => {
     condition = { ...condition, talent: talent };
   }
 
-  if (status) {
+  if (['Draft', 'Published'].includes(status)) {
     condition = {
       ...condition,
-      statusEvent: { $regex: status, $options: 'i' },
+      statusEvent: status,
     };
   }
 
@@ -178,7 +178,13 @@ const updateStatusEvents = async (req) => {
   const { id } = req.params;
   const { statusEvent } = req.body;
 
-  const check = await Events.findOne({ _id: id });
+  if (!['Draft', 'Published'].includes(statusEvent))
+    throw new BadRequestError('Status harus Draft atau Published');
+
+  const check = await Events.findOne({
+    _id: id,
+    organizer: req.user.organizer,
+  });
 
   if (!check) throw new NotFoundError(`Event dengan id ${id} tidak ditemukan`);
 

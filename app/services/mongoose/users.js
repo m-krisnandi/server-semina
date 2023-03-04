@@ -26,23 +26,29 @@ const createOrganizer = async (req) => {
 };
 
 const createUsers = async (req, res) => {
-    const {name, password, role, confirmPassword, email } = req.body;
+  const { name, password, role, confirmPassword, email } = req.body;
 
-    if (password !== confirmPassword) {
-        throw new BadRequestError('Password dan confirmPassword tidak sama');
-    }
+  if (password !== confirmPassword) {
+    throw new BadRequestError('Password dan confirmPassword tidak sama');
+  }
 
-    const result = await Users.create({
-        name,
-        email,
-        organizer: req.user.organizer,
-        password,
-        role,
-    })
+  const result = await Users.create({
+    name,
+    email,
+    organizer: req.user.organizer,
+    password,
+    role,
+  });
 
-    delete result._doc.password;
+  delete result._doc.password;
 
-    return result;
+  return result;
 };
 
-module.exports = { createOrganizer, createUsers };
+const getAllUsers = async (req) => {
+  const result = await Users.find();
+
+  return result;
+};
+
+module.exports = { createOrganizer, createUsers, getAllUsers };
