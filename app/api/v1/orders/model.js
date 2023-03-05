@@ -56,11 +56,11 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     orderItems: [orderDetailSchema],
-    // participant: {
-    //     type: mongoose.Types.ObjectId,
-    //     ref: 'Participant',
-    //     required: true,
-    // },
+    participant: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Participant',
+        required: true,
+    },
     // payment: {
     //     type: mongoose.Types.ObjectId,
     //     ref: 'Payment',

@@ -5,4 +5,6 @@ module.exports = {
   urlDb : process.env.URL_MONGODB_DEV,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiration: process.env.JWT_EXPIRATION,
+  gmail: process.env.GMAIL,
+  password: process.env.PASSWORD,
 };
