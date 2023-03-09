@@ -39,7 +39,7 @@ const eventSchema = new Schema(
     about: {
       type: String,
     },
-    tagLine: {
+    tagline: {
       type: String,
       required: [true, 'Tagline harus diisi'],
     },
